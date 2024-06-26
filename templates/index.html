@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>面包狗聚合新闻网</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .navbar {
+            width: 100%;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar .menu {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar .menu a {
+            text-decoration: none;
+            color: #333;
+        }
+        .navbar .login-register a {
+            text-decoration: none;
+            color: #333;
+        }
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .news-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            width: 75%;
+        }
+        .news {
+            flex: 1 1 100%;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            overflow: hidden;
+            position: relative;
+            transition: height 1s;
+        }
+        .news-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transition: top 0.5s, opacity 0.5s;
+            font-size: 24px;
+            background-color: #f0f0f0;
+            padding: 10px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .news:hover .news-title {
+            top: 0;
+            opacity: 1;
+        }
+        .news-list {
+            margin-top: 50px;
+        }
+        .news-list a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            padding: 5px 0;
+        }
+        .news-list a:hover {
+            text-decoration: underline;
+        }
+        .sidebar {
+            width: 20%;
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            background-color: #212121;
+            padding: 10px 0;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="menu">
+                <a href="https://news.zol.com.cn/">中关村</a>
+                <a href="#">央视</a>
+                <a href="#">新闻2</a>
+            </div>
+            <div class="login-register">
+                <a href="#">登录</a> / <a href="#">注册</a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="news-container" id="news-container">
+                <!-- 动态填充新闻内容 -->
+            </div>
+            <div class="sidebar">
+                热搜榜
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        &#xA9;&#x20;&#x32;&#x30;&#x32;&#x34;&#x20;&#x2D;&#x20;&#x6C38;&#x4E45;&#x20;&#x9762;&#x5305;&#x72D7;&#x20;&#x7248;&#x6743;&#x6240;&#x6709;
+    </div>
+    <script>
+    fetch('/get_zgc_news')
+        .then(response => response.json())
+        .then(data => {
+            const newsContainer = document.getElementById('news-container');
+            Object.keys(data).forEach(newsKey => {
+                const newsGroup = document.createElement('div');
+                newsGroup.classList.add('news');
+
+                const newsTitle = document.createElement('div');
+                newsTitle.classList.add('news-title');
+                newsTitle.textContent = newsKey;
+                newsGroup.appendChild(newsTitle);
+
+                const newsList = document.createElement('div');
+                newsList.classList.add('news-list');
+                data[newsKey].forEach(item => {
+                    const linkElement = document.createElement('a');
+                    linkElement.href = item.link;
+                    linkElement.textContent = item.title;
+                    newsList.appendChild(linkElement);
+                });
+                newsGroup.appendChild(newsList);
+
+                // 动态调整新闻容器的高度
+                const listItems = newsList.querySelectorAll('a').length;
+                newsGroup.style.height = `${80 + listItems * 30}px`; // Adjust height based on list length
+
+                newsContainer.appendChild(newsGroup);
+            });
+        })
+        .catch(error => console.error('Error loading the news:', error));
+    </script>
+</body>
+</html>
