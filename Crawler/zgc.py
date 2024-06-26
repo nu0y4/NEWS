@@ -5,7 +5,7 @@ from pymongo import MongoClient
 # 连接到 MongoDB
 client = MongoClient('mongodb://localhost:27017/')
 db = client['MBGNEWs']  # 使用数据库
-collection = db.zgc2  # 使用集合
+collection = db.zgc  # 使用集合
 
 burp0_url = "https://news.zol.com.cn:443/"
 burp0_headers = {

@@ -7,6 +7,11 @@ app = Flask(__name__)
 def index():
     # 渲染模板文件
     return render_template('index.html')
+
+@app.route('/login')
+def login():
+    # 渲染模板文件
+    return render_template('./login/index.html')
 @app.route('/get_zgc_news')
 def get_zgc_news():
     client = MongoClient('mongodb://localhost:27017/')
@@ -36,4 +41,4 @@ def get_zgc_news():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')
