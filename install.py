@@ -39,6 +39,12 @@ def check_and_create_mongodb():
         db.create_collection('cctv')
         printc("已创建集合 'cctv'")
 
+    if 'user' in db.list_collection_names():
+        printc("集合 'user' 已存在")
+    else:
+        db.create_collection('user')
+        printc("已创建集合 'user'")
+
     # 关闭数据库连接
     client.close()
 

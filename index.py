@@ -1,8 +1,14 @@
 from flask import Flask, jsonify, render_template, request, make_response, redirect, url_for
 from pymongo import MongoClient
-
+import hashlib
 app = Flask(__name__)
 
+client = MongoClient('mongodb://localhost:27017/')
+db = client['MBGNEWs']
+users_collection = db['user']
+
+def md5_hash(password):
+    return hashlib.md5(password.encode()).hexdigest()
 
 @app.route('/')
 def index():
@@ -25,23 +31,41 @@ def login():
     if request.method == 'POST':
         if 'username' not in request.form or 'password' not in request.form:
             return render_template('login/index.html')
+
         username = request.form['username']
         password = request.form['password']
         remember = request.form.get('remember')
 
-        # 这里你可以添加用户名和密码验证逻辑
-        if username == 'admin' and password == 'admin':  # 简单示例
+        hashed_password = md5_hash(password)
+
+        # 查找用户
+        user = users_collection.find_one({'username': username})
+
+        if user:
+            # 用户存在，检查密码是否匹配
+            if user['password'] == hashed_password:
+                resp = make_response(redirect(url_for('index')))
+                if remember:
+                    resp.set_cookie('username', username, max_age=30 * 24 * 60 * 60)
+                    resp.set_cookie('password', hashed_password, max_age=30 * 24 * 60 * 60)
+                else:
+                    resp.set_cookie('username', username)
+                    resp.set_cookie('password', hashed_password)
+                return resp
+            else:
+                return '<script>alert("密码错误"); window.location.href="/login";</script>', 401
+        else:
+            # 用户不存在，创建新用户
+            users_collection.insert_one({'username': username, 'password': hashed_password})
             resp = make_response(redirect(url_for('index')))
             if remember:
                 resp.set_cookie('username', username, max_age=30 * 24 * 60 * 60)
-                resp.set_cookie('password', password, max_age=30 * 24 * 60 * 60)
+                resp.set_cookie('password', hashed_password, max_age=30 * 24 * 60 * 60)
             else:
                 resp.set_cookie('username', username)
-                resp.set_cookie('password', password)
+                resp.set_cookie('password', hashed_password)
             return resp
-        else:
-            resp = make_response(redirect(url_for('login')))
-            # return '<script>alert(`密码错误`)</script>', 401
+
     return render_template('login/index.html')
 
 
