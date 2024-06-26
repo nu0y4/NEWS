@@ -1,10 +1,8 @@
-<center>
 
 # 面包狗新闻聚合网
 
 ![image](favicon.ico)
 
-</center>
 
 ## 安装:
 
