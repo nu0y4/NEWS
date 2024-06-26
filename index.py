@@ -14,9 +14,12 @@ def md5_hash(password):
 def index():
     # 渲染模板文件
     username = request.cookies.get('username')
-    print(username)
-    return render_template('index.html', username=username)
+    # print(username)
+    return render_template('index.html', username=username[0].upper())
 
+@app.route('/setting')
+def setting():
+    return '<script>alert(`还没做好,等过几天吧,这是个人信息的页面`);window.location.href="/";</script>'
 
 @app.route('/logout')
 def logout():

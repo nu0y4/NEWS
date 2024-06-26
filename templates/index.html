@@ -116,13 +116,20 @@
             </div>
             <div class="login-register">
                 {% if username %}
-                    <a href="./logout">欢迎{{ username }},退出</a>
+                    <svg width="25" height="25" xmlns="http://www.w3.org/2000/svg" style="margin-right: 5px; vertical-align: middle;" onclick="window.location.href = `./setting`;">
+                        <!-- 红色圆形 -->
+                        <circle cx="12.5" cy="12.5" r="12.5" fill="#0288D1" />
+                        <!-- 中间的字符 A -->
+                        <text x="12.5" y="12.5" font-family="Arial" font-size="15" fill="white" text-anchor="middle" dominant-baseline="middle">A</text>
+                    </svg>
+                    <a href="./setting" style="vertical-align: top;">退出</a>
                 {% else %}
                     <a href="./login">登录</a>
                 {% endif %}
             </div>
         </div>
         <div class="main-content">
+
             <div class="news-container" id="news-container">
                 <!-- 动态填充新闻内容 -->
             </div>
