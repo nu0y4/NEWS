@@ -1,17 +1,50 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request, make_response, redirect, url_for
 from pymongo import MongoClient
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
     # 渲染模板文件
-    return render_template('index.html')
+    username = request.cookies.get('username')
+    print(username)
+    return render_template('index.html', username=username)
 
-@app.route('/login')
+
+@app.route('/logout')
+def logout():
+    resp = make_response(redirect(url_for('index')))
+    resp.set_cookie('username', '', expires=0)
+    resp.set_cookie('password', '', expires=0)
+    return resp
+
+
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    # 渲染模板文件
-    return render_template('./login/index.html')
+    if request.method == 'POST':
+        if 'username' not in request.form or 'password' not in request.form:
+            return render_template('login/index.html')
+        username = request.form['username']
+        password = request.form['password']
+        remember = request.form.get('remember')
+
+        # 这里你可以添加用户名和密码验证逻辑
+        if username == 'admin' and password == 'admin':  # 简单示例
+            resp = make_response(redirect(url_for('index')))
+            if remember:
+                resp.set_cookie('username', username, max_age=30 * 24 * 60 * 60)
+                resp.set_cookie('password', password, max_age=30 * 24 * 60 * 60)
+            else:
+                resp.set_cookie('username', username)
+                resp.set_cookie('password', password)
+            return resp
+        else:
+            resp = make_response(redirect(url_for('login')))
+            # return '<script>alert(`密码错误`)</script>', 401
+    return render_template('login/index.html')
+
+
 @app.route('/get_zgc_news')
 def get_zgc_news():
     client = MongoClient('mongodb://localhost:27017/')
@@ -41,4 +74,4 @@ def get_zgc_news():
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
