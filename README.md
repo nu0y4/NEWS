@@ -18,6 +18,10 @@ python3 ./Crawler/zgc.py
 #爬中央视新闻
 python3 ./Crawler/cctv.py
 ```
+## 运行:
+```
+python3 index.py
+```
 
 ## 数据源:
 ```
