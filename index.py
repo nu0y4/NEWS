@@ -1,25 +1,34 @@
 from flask import Flask, jsonify, render_template, request, make_response, redirect, url_for
 from pymongo import MongoClient
 import hashlib
+
 app = Flask(__name__)
 
 client = MongoClient('mongodb://localhost:27017/')
 db = client['MBGNEWs']
 users_collection = db['user']
 
+
 def md5_hash(password):
     return hashlib.md5(password.encode()).hexdigest()
+
 
 @app.route('/')
 def index():
     # 渲染模板文件
     username = request.cookies.get('username')
-    # print(username)
-    return render_template('index.html', username=username[0].upper())
+    if username:
+        # print(username)
+        return render_template('index.html', username=username[0].upper())
+    else:
+        return render_template('index.html', username='')
+
 
 @app.route('/setting')
 def setting():
-    return '<script>alert(`还没做好,等过几天吧,这是个人信息的页面`);window.location.href="/";</script>'
+    username = request.cookies.get('username')
+    return render_template('setting/index.html', username=username)
+
 
 @app.route('/logout')
 def logout():
