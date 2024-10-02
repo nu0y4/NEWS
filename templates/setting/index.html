@@ -36,8 +36,30 @@
 
         // 模拟上传头像
         function uploadAvatar() {
-            alert('头像已上传！');
-            closeAvatarPopup();
+            const formData = new FormData();
+            const fileField = document.querySelector('input[type="file"]');
+
+            if (fileField.files.length === 0) {
+                alert('请选择一个文件上传');
+                return;
+            }
+
+            formData.append('avatar', fileField.files[0]);
+
+            fetch('/upload_avatar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert('头像上传成功！');
+                closeAvatarPopup();
+                location.reload();  // 重新加载页面以刷新头像
+            })
+            .catch(error => {
+                console.error('上传失败:', error);
+                alert('头像上传失败，请重试');
+            });
         }
         function showContent(contentId) {
             // 隐藏所有卡片内容
@@ -47,18 +69,22 @@
             // 显示点击的卡片内容
             document.getElementById(contentId).style.display = 'block';
         }
+        function logout(){
+            fetch('/logout');
+            window.location.href="./";
+        }
     </script>
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
             <div class="avatar" onclick="openAvatarPopup()">
-                <img src="default-avatar.png" id="current-avatar">
+                <img src="{{ avatar_url }}" alt="头像" id="current-avatar">
             </div>
             <ul>
                 <li><a href="#" onclick="showContent('profile')">个人信息</a></li>
                 <li><a href="#" onclick="showContent('settings')">推送设置</a></li>
-                <li><a href="#" onclick="showContent('logout')">退出登录</a></li>
+                <li><a href="#" onclick="logout()">退出登录</a></li>
             </ul>
         </div>
         <div class="main-content">
@@ -67,9 +93,6 @@
             </div>
             <div id="settings" class="card-content" style="display: none;">
                 <div class="card">这是推送设置页面内容</div>
-            </div>
-            <div id="logout" class="card-content" style="display: none;">
-                <div class="card">这是退出登录页面内容</div>
             </div>
         </div>
     </div>
