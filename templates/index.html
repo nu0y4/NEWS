@@ -39,7 +39,7 @@
         }
         .main-content {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-evenly;
             margin-top: 20px;
 
         }
@@ -48,7 +48,7 @@
             flex-wrap: wrap;
             gap: 15px;
             width: 75%;
-             opacity: 0.7;
+            opacity: 0.7;
         }
         .news {
             flex: 1 1 100%;
@@ -133,9 +133,6 @@
             <div class="news-container" id="news-container">
                 <!-- 动态填充新闻内容 -->
             </div>
-            <div class="sidebar">
-                热搜榜
-            </div>
         </div>
     </div>
     <div class="footer">
@@ -173,6 +170,7 @@
             });
         })
         .catch(error => console.error('Error loading the news:', error));
+
 
          !function () {
         //封装方法，压缩之后减少文件大小
