@@ -73,6 +73,43 @@
             fetch('/logout');
             window.location.href="./";
         }
+        // 显示或隐藏表单和用户信息
+        function toggleEditMode() {
+            var infoDisplay = document.getElementById('user-info');
+            var formDisplay = document.getElementById('profile-form');
+            var editButton = document.getElementById('edit-button');
+
+            // 切换显示表单或信息
+            if (infoDisplay.style.display === 'none') {
+                infoDisplay.style.display = 'block';
+                formDisplay.style.display = 'none';
+                editButton.textContent = '修改信息';
+            } else {
+                infoDisplay.style.display = 'none';
+                formDisplay.style.display = 'block';
+                editButton.style.marginTop="15px";
+                editButton.textContent = '取消';
+            }
+        }
+
+        // 显示或隐藏表单和用户信息
+        function toggleEditModeEmail() {
+            var infoDisplay = document.getElementById('user-info-email');
+            var formDisplay = document.getElementById('profile-form-email');
+            var editButton = document.getElementById('edit-button-email');
+
+            // 切换显示表单或信息
+            if (infoDisplay.style.display === 'none') {
+                infoDisplay.style.display = 'block';
+                formDisplay.style.display = 'none';
+                editButton.textContent = '修改信息';
+            } else {
+                infoDisplay.style.display = 'none';
+                formDisplay.style.display = 'block';
+                editButton.style.marginTop="15px";
+                editButton.textContent = '取消';
+            }
+        }
     </script>
 </head>
 <body>
@@ -89,10 +126,50 @@
         </div>
         <div class="main-content">
             <div id="profile" class="card-content">
-                <div class="card">这是个人信息页面内容</div>
+                <!-- 用户信息展示 -->
+                <div class="card">
+                    <!-- 用户信息显示 -->
+                    <div id="user-info">
+                        <h2>个人信息</h2>
+                        <p style="margin-bottom: 10px;">账号: <span>{{ username }}</span></p>
+<!--                        <p>密码: <span>{{ password }}</span></p>-->
+                    </div>
+
+                    <!-- 编辑表单，默认隐藏 -->
+                    <form id="profile-form" method="POST" action="{{ url_for('profile') }}" style="display: none;">
+                        <h2>修改密码</h2>
+                        <label for="password">密码:</label>
+                        <input type="password" id="password" name="password" placeholder="请输入密码" required>
+
+                        <button type="submit">保存</button>
+                    </form>
+
+                    <!-- 修改信息按钮 -->
+                    <button id="edit-button" onclick="toggleEditMode()">修改信息</button>
+                </div>
             </div>
             <div id="settings" class="card-content" style="display: none;">
-                <div class="card">这是推送设置页面内容</div>
+               <div class="card">
+                    <!-- 用户信息显示 -->
+                    <div id="user-info-email">
+                        <h2>个人邮箱</h2>
+                        <p style="margin-bottom: 10px;">邮箱: <span>{{ email }}</span></p>
+<!--                        <p>密码: <span>{{ password }}</span></p>-->
+                    </div>
+
+                    <!-- 编辑表单，默认隐藏 -->
+                    <form id="profile-form-email" method="POST" action="{{ url_for('email') }}" style="display: none;">
+                        <h2>修改邮箱</h2>
+                        <label for="email">邮箱:</label>
+                        <input type="email" id="email" name="email" placeholder="请输入邮箱" required>
+
+                        <button type="submit">保存</button>
+                    </form>
+
+                    <!-- 修改信息按钮 -->
+                    <button id="edit-button-email" onclick="toggleEditModeEmail()">修改邮箱</button>
+                   <p style="font-size: 10px;margin-top: 10px;color: burlywood;">这里的邮箱用于每天早上8点推送新闻</p>
+                </div>
             </div>
         </div>
     </div>

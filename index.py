@@ -7,10 +7,11 @@ import hashlib
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-
+app.secret_key = 'f1se56f1g5r'
+# MongoDB连接设置
 client = MongoClient('mongodb://localhost:27017/')
 db = client['MBGNEWs']
-users_collection = db['user']
+user_collection = db['user']
 
 
 def md5_hash(password):
@@ -91,12 +92,18 @@ def setting():
         else:
             avatar_url = url_for('static', filename='uploads/avatars/null.png')
 
-        return render_template('setting/index.html', username=username[0].upper(), avatar_url=avatar_url)
+        # 查询 user_collection 中的 email
+        user_data = user_collection.find_one({"username": username})
+        if user_data and 'email' in user_data:
+            email = user_data['email']
+        else:
+            email = ""
+
+        return render_template('setting/index.html', username=username, avatar_url=avatar_url, email=email)
     else:
         # 未登录用户，显示默认头像
         avatar_url = url_for('static', filename='uploads/avatars/null.png')
-        return render_template('setting/index.html', username='', avatar_url=avatar_url)
-
+        return render_template('setting/index.html', username='', avatar_url=avatar_url, email="空")
 
 
 @app.route('/logout')
@@ -120,7 +127,7 @@ def login():
         hashed_password = md5_hash(password)
 
         # 查找用户
-        user = users_collection.find_one({'username': username})
+        user = user_collection.find_one({'username': username})
 
         if user:
             # 用户存在，检查密码是否匹配
@@ -137,7 +144,7 @@ def login():
                 return '<script>alert("密码错误"); window.location.href="/login";</script>', 401
         else:
             # 用户不存在，创建新用户
-            users_collection.insert_one({'username': username, 'password': hashed_password})
+            user_collection.insert_one({'username': username, 'password': hashed_password})
             resp = make_response(redirect(url_for('index')))
             if remember:
                 resp.set_cookie('username', username, max_age=30 * 24 * 60 * 60)
@@ -177,6 +184,99 @@ def get_zgc_news():
     # 返回 JSON 数据
     return jsonify(response)
 
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    username = request.cookies.get('username')
+
+    if not username:
+        flash('请先登录')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # 获取表单数据
+        # new_username = request.form['username']
+        new_password = request.form['password']
+
+        # 对密码进行MD5加密
+        password_hash = md5_hash(new_password)
+
+        # 更新用户信息到数据库
+        user_collection.update_one(
+            {"username": username},
+            {
+                "$set": {
+                    # "username": new_username,
+                    "password": password_hash
+                }
+            }
+        )
+
+        # 更新cookie中的用户名
+        # resp = make_response(redirect(url_for('profile')))
+        # resp.set_cookie('username', new_username)
+        # flash("个人信息已更新")
+        # return resp
+
+    # 获取用户信息
+    user_data = user_collection.find_one({"username": username})
+
+    if user_data:
+        password = user_data.get('password', '')
+    else:
+        flash("用户信息未找到")
+        return redirect(url_for('profile'))
+    setting = url_for('setting')
+
+    # 渲染模板并传递用户数据
+    return redirect(setting)
+
+
+@app.route('/email', methods=['GET', 'POST'])
+def email():
+    username = request.cookies.get('username')
+
+    if not username:
+        flash('请先登录')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # 获取表单数据
+        # new_username = request.form['username']
+        new_email = request.form['email']
+
+        # 对密码进行MD5加密
+        # password_hash = md5_hash(new_password)
+
+        # 更新用户信息到数据库
+        user_collection.update_one(
+            {"username": username},
+            {
+                "$set": {
+                    # "username": new_username,
+                    "email": new_email
+                }
+            }
+        )
+
+        # 更新cookie中的用户名
+        # resp = make_response(redirect(url_for('profile')))
+        # resp.set_cookie('username', new_username)
+        # flash("个人信息已更新")
+        # return resp
+
+    # 获取用户信息
+    user_data = user_collection.find_one({"username": username})
+
+    if user_data:
+        email = user_data.get('email', '')
+    else:
+        flash("用户信息未找到")
+        return redirect(url_for('setting'))
+    setting = url_for('setting')
+
+    # 渲染模板并传递用户数据
+    return redirect(setting)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
