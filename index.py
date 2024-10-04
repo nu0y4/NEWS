@@ -90,7 +90,7 @@ def setting():
         if avatar_path:
             avatar_url = url_for('static', filename=f'uploads/avatars/{os.path.basename(avatar_path)}')
         else:
-            avatar_url = url_for('static', filename='uploads/avatars/null.png')
+            avatar_url = url_for('static', filename='uploads/avatars/null.jpg')
 
         # 查询 user_collection 中的 email
         user_data = user_collection.find_one({"username": username})
